@@ -61,7 +61,7 @@ def find_function(h, descriptors):
 
     return matched_functions
 
-# get JS func
+# get interact
 # reurn {'smali_name': MethodClassAnalysisWrapper}
 def get_javascript_interact(h):
     javascript_interacts = [
@@ -79,7 +79,7 @@ def get_javascript_interact(h):
 
     return find_function(h, javascript_interacts)
 
-# get interface
+# get JS func
 # reurn {'smali_name': MethodClassAnalysisWrapper}
 def get_javascript_interface(h,interface):
     javascript_interfaces = interface
