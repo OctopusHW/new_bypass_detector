@@ -79,21 +79,23 @@ def get_javascript_interact(h):
 
     return find_function(h, javascript_interacts)
 
+# get interface
+# reurn {'smali_name': MethodClassAnalysisWrapper}
 def get_javascript_interface(h,interface):
-    javascript_interface = interface
+    javascript_interfaces = interface
 
-    return find_function(h, javascript_interface)
+    return find_function(h, javascript_interfaces)
 
 # get shouldOverrideUrlLoading
 # reurn {'smali_name': MethodClassAnalysisWrapper}
 def get_shouldoverride(h):
-    shouldoverride = [
+    shouldoverrides = [
         " shouldOverrideUrlLoading (Landroid/webkit/WebView; Ljava/lang/String;)Z",
         " shouldOverrideUrlLoading (Landroid/webkit/WebView; Landroid/webkit/WebResourceRequest;)Z",
         " shouldOverrideUrlLoading "
     ]
 
-    return find_function(h, shouldoverride)
+    return find_function(h, shouldoverrides)
 
 # get loadUrl
 # reurn {'smali_name': MethodClassAnalysisWrapper}
