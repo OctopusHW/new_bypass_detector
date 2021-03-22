@@ -58,7 +58,6 @@ def find_function(h, descriptors):
                 t_method=method_analysis.get_method()
                 t_analysis=h._Heardroguard__dx.get_method_analysis(t_method)
                 matched_functions[method_name] = MethodClassAnalysisWrapper(h, t_analysis)
-
     return matched_functions
 
 # get interact
@@ -76,14 +75,12 @@ def get_javascript_interact(h):
         " onReceivedTitle (Landroid/webkit/WebView; Ljava/lang/String;)V",
         " onShowFileChooser (Landroid/webkit/WebView; Landroid/webkit/ValueCallback; Landroid/webkit/WebChromeClient$FileChooserParams;)Z"
     ]
-
     return find_function(h, javascript_interacts)
 
 # get JS func
 # reurn {'smali_name': MethodClassAnalysisWrapper}
 def get_javascript_interface(h,interface):
     javascript_interfaces = interface
-
     return find_function(h, javascript_interfaces)
 
 # get shouldOverrideUrlLoading
@@ -94,25 +91,20 @@ def get_shouldoverride(h):
         " shouldOverrideUrlLoading (Landroid/webkit/WebView; Landroid/webkit/WebResourceRequest;)Z",
         " shouldOverrideUrlLoading "
     ]
-
     return find_function(h, shouldoverrides)
 
 # get loadUrl
-# reurn {'smali_name': MethodClassAnalysisWrapper}
-def get_loadUrl(h):
-    loadUrl = [
-        " loadUrl (Ljava/lang/String;)V"
-    ]
-
-    return find_function(h, loadUrl)
+# reurn String
+def get_loadUrl():
+    loadUrlStr = "Landroid/webkit/WebView; loadUrl (Ljava/lang/String;)V"
+    return loadUrlStr
 
 # get except
 # reurn {'smali_name': MethodClassAnalysisWrapper}
 def get_except(h):
     loadUrl = [
-        "c (Ljava/lang/Class; Ljava/lang/String; [Ljava/lang/Class;)Ljava/lang/reflect/Method"
+        ""
     ]
-
     return find_function(h, loadUrl)
 
 
@@ -129,7 +121,6 @@ def find_path(h,sink_method, source_method, except_method=[]):
     swept = [source_method] + except_method  # list to record function searched  [MethodClassAnalysisWrapper]
 
     paths = []  # All paths from target to func
-
     stageCount = {}  # trick for backtrace
     stage = 0
 
@@ -140,7 +131,6 @@ def find_path(h,sink_method, source_method, except_method=[]):
         stack.append(ref)
 
     # Do DFS
-
     while (len(stack) > 0):
         upper_method = stack.pop()
 
@@ -208,9 +198,31 @@ def find_path(h,sink_method, source_method, except_method=[]):
                 stage -= 1
                 stageCount[stage] -= 1
                 path.pop()
-
     # print stageCount
     return paths
+
+
+#
+# Merge Function
+#
+# @param type,sink ,source: String
+def get_path(hearlysis, type, sink = None, source = None):
+    if type == str(0):
+        loadUrl = get_loadUrl()
+        shouldoverride = get_shouldoverride(hearlysis)
+        printF(loadUrl, shouldoverride, [])
+        interact = get_javascript_interact(hearlysis)
+        printF(loadUrl, interact, [])
+        interface = hearlysis.get_JavascriptInterface()  # get_javascript_interface(hearlysis)
+        interface = get_javascript_interface(hearlysis, interface)
+        printF(loadUrl, interface, [])
+    else:
+        if sink != None and source != None :
+            sink_methods = hearlysis.get_method_full(sink)
+            source_methods = find_function(hearlysis, [source])
+            for sink_method in sink_methods:
+                printF(sink_method, source_methods, [])
+
 
 #
 # print format
@@ -224,43 +236,22 @@ def printF(sink_method,source_method=[],except_method=[]):
             for p in path:
                 if isinstance(p, MethodClassAnalysisWrapper) or isinstance(p, MethodClassAnalysis) :
                     print("[*] " + str(p.full_name))
-                #else:
-                    #print(p)
             print("*************END*************")
-
 
 
 if __name__ == '__main__':
     debug = False
     if len(sys.argv) < 2:
         print("Usage: ")
-        print("      python3 new_bypass_detector.py {target.apk}")
+        print("      python3 new_bypass_detector.py {target.apk} {type} {sink} {source}")
 
     hearlysis = Heardroguard(*AnalyzeAPK(sys.argv[1]))
 
-    #print("get_except")
-    #exceptM = get_except(hearlysis)
-    #print(exceptM)
+    type = sys.argv[2]
+    if type == str(1):
+        sink = sys.argv[3]
+        source = sys.argv[4]
+        get_path(hearlysis, type, sink, source)
+    else:
+        get_path(hearlysis, type)
 
-    #print("get_loadUrl")
-    #loadUrl = get_loadUrl(hearlysis)
-    loadUrlStr = "Landroid/webkit/WebView; loadUrl (Ljava/lang/String;)V"
-
-    print("get_shouldoverride")
-    shouldoverride = get_shouldoverride(hearlysis)
-    #print(shouldoverride)
-    printF(loadUrlStr,shouldoverride,[])
-
-    #print("get_javascript_interact")
-    #interact=get_javascript_interact(hearlysis)
-    #print(interact)
-    #printF(loadUrl, interact, [])
-
-    print("get_javascript_interface")
-    interface = hearlysis.get_JavascriptInterface()#get_javascript_interface(hearlysis)
-    interface = get_javascript_interface(hearlysis,interface)
-    #print(interface)
-    printF(loadUrlStr, interface, [])
-
-
-#D:\code\new_bypass_detector\apk
